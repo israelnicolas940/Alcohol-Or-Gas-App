@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alcohol">Álcool</string>
+    <string name="gas">Gasolina</string>
+    <string name="light_mode">Tema Claro</string>
+    <string name="dark_mode">Tema Escuro</string>
+</resources>
