@@ -26,22 +26,6 @@ class MainViewModel : ViewModel() {
     private val _bestFuelResult = mutableStateOf("")
     val bestFuelResult: State<String> = _bestFuelResult
 
-    // State for light and dark theme colors
-    private val _lightThemeColors = mutableStateOf(
-        ThemeColors(
-            surface = 0xFFFFFFFF.toInt(), // White
-            onSurface = 0xFF000000.toInt() // Black
-        )
-    )
-    private val _darkThemeColors = mutableStateOf(
-        ThemeColors(
-            surface = 0xFF000000.toInt(), // Black
-            onSurface = 0xFFFFFFFF.toInt() // White
-        )
-    )
-
-    val lightThemeColors: State<ThemeColors> = _lightThemeColors
-    val darkThemeColors: State<ThemeColors> = _darkThemeColors
 
     // Expose mutable states for input updates
     var isDarkThemeMutable = _isDarkTheme
@@ -50,9 +34,3 @@ class MainViewModel : ViewModel() {
     var alcoholPriceMutable = _alcoholPrice
     var bestFuelResultMutable = _bestFuelResult
 }
-
-// Data class for theme colors
-data class ThemeColors(
-    val surface: Int,
-    val onSurface: Int
-)

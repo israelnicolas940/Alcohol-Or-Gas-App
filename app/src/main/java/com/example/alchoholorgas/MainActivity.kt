@@ -22,6 +22,8 @@ import com.example.alchoholorgas.ui.theme.AlcoholOrGasTheme
 import com.example.alchoholorgas.ui.components.CalculateButton
 import androidx.compose.runtime.Composable
 import androidx.activity.viewModels
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -31,33 +33,31 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AlcoholOrGasTheme {
+            var isDarkTheme = remember { mutableStateOf(false) }
+            AlcoholOrGasTheme(darkTheme = isDarkTheme.value) {
                 Surface(tonalElevation = 5.dp) {
-                    AppCompose()
+                    AppCompose(isDarkTheme)
                 }
             }
         }
     }
 }
 
-@Preview
 @Composable
-fun AppCompose() {
+fun AppCompose(isDarkTheme: MutableState<Boolean>) {
     val viewModel: MainViewModel = viewModel()
+
     // Observing state from the ViewModel
     val is75Percent = viewModel.is75PercentMutable.value
     val gasPrice = viewModel.gasPriceMutable.value
     val alcoholPrice = viewModel.alcoholPriceMutable.value
     val bestFuelResult = viewModel.bestFuelResultMutable.value
-    val isDarkTheme = viewModel.isDarkThemeMutable.value
 
-    // Get current theme colors
-    val themeColors = if (isDarkTheme) viewModel.darkThemeColors.value else viewModel.lightThemeColors.value
+    val contentDescriptionSwitchTheme = if (isDarkTheme.value) "Tema escuro" else "Tema claro"
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(themeColors.surface))
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -68,13 +68,15 @@ fun AppCompose() {
             horizontalArrangement = Arrangement.End
         ) {
             Text(
-                text = if (isDarkTheme) "Dark Mode" else "Light Mode",
+                text = if (isDarkTheme.value) "Dark Mode" else "Light Mode",
                 style = MaterialTheme.typography.bodyLarge,
-                color = Color(themeColors.onSurface)
             )
             Switch(
-                checked = isDarkTheme,
-                onCheckedChange = { viewModel.isDarkThemeMutable.value = it }
+                checked = isDarkTheme.value,
+                onCheckedChange = { isDarkTheme.value = it },
+                modifier = Modifier.semantics {
+                    this.contentDescription = contentDescriptionSwitchTheme
+                }
             )
         }
 
@@ -83,7 +85,6 @@ fun AppCompose() {
             text = "Gasolina ou Álcool?",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(themeColors.onSurface),
             modifier = Modifier.padding(vertical = 8.dp)
         )
 
@@ -101,6 +102,7 @@ fun AppCompose() {
             modifier = Modifier.fillMaxWidth()
         )
 
+        val contentDescriptionSwitchUsage = if (is75Percent) "75% de aproveitamento" else "70% de aproveitamento"
         // Utilization Rate Toggle
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -108,11 +110,13 @@ fun AppCompose() {
         ) {
             Text(
                 text = if (is75Percent) "75%" else "70%",
-                color = Color(themeColors.onSurface)
             )
             Switch(
                 checked = is75Percent,
-                onCheckedChange = { viewModel.is75PercentMutable.value = it }
+                onCheckedChange = { viewModel.is75PercentMutable.value = it },
+                modifier = Modifier.semantics {
+                    this.contentDescription = contentDescriptionSwitchUsage
+                }
             )
         }
 
@@ -129,7 +133,6 @@ fun AppCompose() {
         if (bestFuelResult.isNotEmpty()) {
             Text(
                 text = "Melhor opção: $bestFuelResult",
-                color = Color(themeColors.onSurface),
                 modifier = Modifier.padding(top = 16.dp)
             )
         }
