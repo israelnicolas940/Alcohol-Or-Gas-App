@@ -1,5 +1,6 @@
 package com.example.alchoholorgas
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,6 +23,8 @@ import com.example.alchoholorgas.ui.theme.AlcoholOrGasTheme
 import com.example.alchoholorgas.ui.components.CalculateButton
 import androidx.compose.runtime.Composable
 import androidx.activity.viewModels
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.ViewModel
@@ -33,10 +36,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var isDarkTheme = remember { mutableStateOf(false) }
+            val context = LocalContext.current
+            val preferencesManager: SharedPreferencesManager = remember { SharedPreferencesManager(context) }
+            var isDarkTheme = remember { mutableStateOf(preferencesManager.loadBoolean("is_dark_theme_checked", false)) }
+            var is75Percent = remember { mutableStateOf(preferencesManager.loadBoolean("is_75_percent_checked", false)) }
             AlcoholOrGasTheme(darkTheme = isDarkTheme.value) {
                 Surface(tonalElevation = 5.dp) {
-                    AppCompose(isDarkTheme)
+                    AppCompose(isDarkTheme, is75Percent)
                 }
             }
         }
@@ -44,11 +50,12 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppCompose(isDarkTheme: MutableState<Boolean>) {
+fun AppCompose(isDarkTheme: MutableState<Boolean>, is75Percent: MutableState<Boolean>) {
     val viewModel: MainViewModel = viewModel()
+    val context = LocalContext.current
+    val preferencesManager: SharedPreferencesManager = remember { SharedPreferencesManager(context) }
 
     // Observing state from the ViewModel
-    val is75Percent = viewModel.is75PercentMutable.value
     val gasPrice = viewModel.gasPriceMutable.value
     val alcoholPrice = viewModel.alcoholPriceMutable.value
     val bestFuelResult = viewModel.bestFuelResultMutable.value
@@ -73,7 +80,10 @@ fun AppCompose(isDarkTheme: MutableState<Boolean>) {
             )
             Switch(
                 checked = isDarkTheme.value,
-                onCheckedChange = { isDarkTheme.value = it },
+                onCheckedChange = {
+                    isDarkTheme.value = it
+                    preferencesManager.saveBoolean("is_dark_theme_checked", it)
+                },
                 modifier = Modifier.semantics {
                     this.contentDescription = contentDescriptionSwitchTheme
                 }
@@ -102,18 +112,21 @@ fun AppCompose(isDarkTheme: MutableState<Boolean>) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        val contentDescriptionSwitchUsage = if (is75Percent) "75% de aproveitamento" else "70% de aproveitamento"
+        val contentDescriptionSwitchUsage = if (is75Percent.value) "75% de aproveitamento" else "70% de aproveitamento"
         // Utilization Rate Toggle
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(vertical = 16.dp)
         ) {
             Text(
-                text = if (is75Percent) "75%" else "70%",
+                text = if (is75Percent.value) "75%" else "70%",
             )
             Switch(
-                checked = is75Percent,
-                onCheckedChange = { viewModel.is75PercentMutable.value = it },
+                checked = is75Percent.value,
+                onCheckedChange = {
+                    is75Percent.value = it
+                    preferencesManager.saveBoolean("is_75_percent_checked", it)
+                },
                 modifier = Modifier.semantics {
                     this.contentDescription = contentDescriptionSwitchUsage
                 }
@@ -124,7 +137,7 @@ fun AppCompose(isDarkTheme: MutableState<Boolean>) {
         CalculateButton(
             gasPrice = gasPrice.toDoubleOrNull() ?: 0.0,
             alcoholPrice = alcoholPrice.toDoubleOrNull() ?: 0.0,
-            utilizationRate = if (is75Percent) 0.75 else 0.7,
+            utilizationRate = if (is75Percent.value) 0.75 else 0.7,
             modifier = Modifier.fillMaxWidth(),
             onResultChanged = { result -> viewModel.bestFuelResultMutable.value = result }
         )
@@ -138,4 +151,3 @@ fun AppCompose(isDarkTheme: MutableState<Boolean>) {
         }
     }
 }
-
