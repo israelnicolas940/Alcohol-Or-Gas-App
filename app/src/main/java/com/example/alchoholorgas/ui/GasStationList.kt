@@ -50,7 +50,7 @@ fun GasStationList(navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Selecione um posto")
+                    Text("Selecione um posto para ver/editar")
                 }
             )
         }
@@ -72,7 +72,7 @@ fun GasStationList(navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxSize()
                             .clickable {
-                                Toast.makeText(context, it.name, Toast.LENGTH_SHORT).show()
+                                navController.navigate("gasStationMenu/?id=${it.id}")
                             }
                     ) {
                         Text(

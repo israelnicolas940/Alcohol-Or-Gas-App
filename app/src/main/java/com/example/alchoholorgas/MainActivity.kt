@@ -42,6 +42,7 @@ import androidx.navigation.compose.composable
 import com.example.alchoholorgas.ui.SaveGasStation
 import com.example.alchoholorgas.ui.AlcoholOrGasApp
 import com.example.alchoholorgas.ui.GasStationList
+import com.example.alchoholorgas.ui.GasStationMenu
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,6 +67,10 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("gasStationList") {
                             GasStationList(navController)
+                        }
+                        composable("gasStationMenu/?id={gasStationID}") { backStackEntry ->
+                            val gasStationID: Int = (backStackEntry.arguments?.getString("gasStationID") ?: "0").toInt()
+                            GasStationMenu(navController, gasStationID)
                         }
                     }
                 }

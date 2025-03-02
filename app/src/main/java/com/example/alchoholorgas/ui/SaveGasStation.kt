@@ -89,14 +89,15 @@ fun SaveGasStation(navController: NavHostController, gasPriceString: String, alc
             onClick = {
                 Toast.makeText(context, "Salvando posto...", Toast.LENGTH_SHORT).show()
 
+                gasStationCounter++
                 val jsonGasStation: JSONObject = GasStation(
+                    gasStationCounter,
                     name,
                     gasPrice.toDoubleOrNull() ?: 0.0,
                     alcoholPrice.toDoubleOrNull() ?: 0.0,
                     address
                 ).toJSONObject()
 
-                gasStationCounter++
                 preferencesManager.saveString("gas_station_json_$gasStationCounter", jsonGasStation.toString())
                 preferencesManager.saveInt("gas_station_counter", gasStationCounter)
 

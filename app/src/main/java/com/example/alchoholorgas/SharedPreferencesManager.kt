@@ -6,6 +6,12 @@ class SharedPreferencesManager (context: Context) {
 
     private val sharedPreferences = context.getSharedPreferences(context.resources.getString(R.string.preferences_file_name), Context.MODE_PRIVATE)
 
+    fun removePreference (key: String) {
+        val editor = sharedPreferences.edit()
+        editor.remove(key)
+        editor.apply()
+    }
+
     fun saveString (key: String, value: String) {
         val editor = sharedPreferences.edit()
         with(editor) {
