@@ -1,5 +1,7 @@
 package com.example.alchoholorgas.ui
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -123,6 +126,17 @@ fun GasStationMenu(navController: NavHostController, gasStationID: Int) {
                 alignment = Alignment.End
             )
         ) {
+            FloatingActionButton(
+                onClick = {
+                    val googleMapsUri = Uri.parse("geo:geo:0,0?q=${gasStation.address}")
+                    val googleMapsIntent = Intent(Intent.ACTION_VIEW, googleMapsUri)
+                    googleMapsIntent.setPackage("com.google.android.apps.maps")
+                    context.startActivity(googleMapsIntent)
+                }
+            ) {
+                Icon(Icons.Filled.LocationOn, "Apagar Posto")
+            }
+
             FloatingActionButton(
                 onClick = {
                     if (gasStation.id < gasStationCounter) {
