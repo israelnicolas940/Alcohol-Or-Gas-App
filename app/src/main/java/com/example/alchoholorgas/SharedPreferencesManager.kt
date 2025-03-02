@@ -29,4 +29,16 @@ class SharedPreferencesManager (context: Context) {
     fun loadBoolean (key: String, defaultValue: Boolean): Boolean {
         return sharedPreferences.getBoolean(key, defaultValue) ?: defaultValue
     }
+
+    fun saveInt (key: String, value: Int) {
+        val editor = sharedPreferences.edit()
+        with(editor) {
+            putInt(key, value)
+            apply()
+        }
+    }
+
+    fun loadInt (key: String, defaultValue: Int): Int {
+        return sharedPreferences.getInt(key, defaultValue) ?: defaultValue
+    }
 }
