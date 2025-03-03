@@ -3,6 +3,7 @@ package com.example.alchoholorgas.utils
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import com.example.alchoholorgas.R
 import com.google.android.gms.location.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -25,14 +26,14 @@ class LocationHelper(private val context: Context) {
                         val latLng = LatLng(location.latitude, location.longitude)
                         onSuccess(latLng)
                     } else {
-                        onFailure(Exception("Location not available"))
+                        onFailure(Exception(context.getString(R.string.location_not_available)))
                     }
                 }
                 .addOnFailureListener { exception ->
                     onFailure(exception)
                 }
         } else {
-            onFailure(Exception("Location permission not granted"))
+            onFailure(Exception(context.getString(R.string.location_not_granted)))
         }
     }
 }

@@ -23,8 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.alchoholorgas.R
 import com.example.alchoholorgas.SharedPreferencesManager
 import com.example.alchoholorgas.data.GasStation
 import org.json.JSONObject
@@ -50,7 +52,7 @@ fun GasStationList(navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Selecione um posto para ver/editar")
+                    Text(stringResource(R.string.select_station))
                 }
             )
         }
@@ -62,7 +64,7 @@ fun GasStationList(navController: NavHostController) {
                 .padding(innerPadding),
             contentPadding = PaddingValues(16.dp)
         ) {
-            items(gasStationList.toList()) {
+            items(gasStationList.toList()) { gasStation ->
                 Card (
                     modifier = Modifier
                         .fillMaxWidth()
@@ -72,11 +74,11 @@ fun GasStationList(navController: NavHostController) {
                         modifier = Modifier
                             .fillMaxSize()
                             .clickable {
-                                navController.navigate("gasStationMenu/?id=${it.id}")
+                                navController.navigate("gasStationMenu/?id=${gasStation.id}")
                             }
                     ) {
                         Text(
-                            text = it.name,
+                            text = gasStation.name,
                             modifier = Modifier.padding(12.dp)
                         )
                     }

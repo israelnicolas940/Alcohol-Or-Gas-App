@@ -19,8 +19,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.alchoholorgas.R
 import com.example.alchoholorgas.SharedPreferencesManager
 import com.example.alchoholorgas.data.GasStation
 import com.example.alchoholorgas.ui.components.PriceBar
@@ -45,7 +47,8 @@ fun SaveGasStation(navController: NavHostController, gasPriceString: String, alc
                 address = "Lat: ${latLng.latitude}, Lng: ${latLng.longitude}"
             },
             onFailure = { exception ->
-                Toast.makeText(context, "Failed to get location: ${exception.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.fail_get_location, exception.message), Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -61,25 +64,25 @@ fun SaveGasStation(navController: NavHostController, gasPriceString: String, alc
         )
     ) {
         PriceBar(
-            label = "Preço da gasolina",
+            label = context.getString(R.string.gas_price),
             text = gasPrice,
             onTextChange = { gasPrice = it },
             modifier = Modifier.fillMaxWidth()
         )
         PriceBar(
-            label = "Preço do álcool",
+            label = context.getString(R.string.alcohol_price),
             text = alcoholPrice,
             onTextChange = { alcoholPrice = it },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
-            label = { Text("Nome do posto") },
+            label = { Text(context.getString(R.string.station_name)) },
             value = name,
             onValueChange = { name = it },
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
-            label = { Text("Endereço do posto") },
+            label = { Text(context.getString(R.string.station_address)) },
             value = address,
             onValueChange = { address = it },
             modifier = Modifier.fillMaxWidth()
@@ -87,7 +90,8 @@ fun SaveGasStation(navController: NavHostController, gasPriceString: String, alc
 
         Button(
             onClick = {
-                Toast.makeText(context, "Salvando posto...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.saving_station), Toast.LENGTH_SHORT).show()
 
                 gasStationCounter++
                 val jsonGasStation: JSONObject = GasStation(
@@ -101,11 +105,12 @@ fun SaveGasStation(navController: NavHostController, gasPriceString: String, alc
                 preferencesManager.saveString("gas_station_json_$gasStationCounter", jsonGasStation.toString())
                 preferencesManager.saveInt("gas_station_counter", gasStationCounter)
 
-                Toast.makeText(context, "Posto salvo com sucesso!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.successfully_saved_station), Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
             }
         ) {
-            Text("Salvar posto")
+            Text(stringResource(R.string.save_station))
         }
     }
 }

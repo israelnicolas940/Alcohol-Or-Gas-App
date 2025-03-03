@@ -57,41 +57,37 @@ class MainActivity : ComponentActivity() {
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                // Permission granted, proceed with location-related tasks
                 println("Location permission granted")
             } else {
-                // Permission denied
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    // Show a rationale (e.g., a dialog or toast)
-                    Toast.makeText(this, "Location permission is required to find nearby gas stations.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.permission_rationale), Toast.LENGTH_LONG).show()
                 } else {
-                    // User selected "Don't ask again" or permanently denied the permission
-                    Toast.makeText(this, "Location permission denied. You can enable it in app settings.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_LONG).show()
                 }
             }
         }
     @Composable
     private fun ShowRationaleDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
         AlertDialog(
-            onDismissRequest = onDismiss, // Called when the user clicks outside the dialog or presses the back button
+            onDismissRequest = onDismiss,
             title = {
-                Text(text = "Location Permission Needed")
+                Text(text = stringResource(R.string.location_permission))
             },
             text = {
-                Text("This app needs location permission to find nearby gas stations. Please grant the permission.")
+                Text(stringResource(R.string.location_permission_explanation))
             },
             confirmButton = {
                 TextButton(
-                    onClick = onConfirm // Trigger permission request again
+                    onClick = onConfirm
                 ) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = onDismiss // Dismiss the dialog
+                    onClick = onDismiss
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -107,13 +103,12 @@ class MainActivity : ComponentActivity() {
         if (showRationale) {
             ShowRationaleDialog(
                 onConfirm = {
-                    // Request the permission again
                     requestPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-                    showRationale = false // Hide the dialog
+                    showRationale = false
                 },
                 onDismiss = {
-                    showRationale = false // Hide the dialog
-                    onDismiss() // Notify the caller that the dialog was dismissed
+                    showRationale = false
+                    onDismiss()
                 }
             )
         }
@@ -129,14 +124,12 @@ class MainActivity : ComponentActivity() {
     ) {
         var showRationale by remember { mutableStateOf(false) }
 
-        // Check and request permission
         LaunchedEffect(Unit) {
             when {
                 ContextCompat.checkSelfPermission(
                     context,
                     android.Manifest.permission.ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED -> {
-                    // Permission already granted
                     println("Permission already granted")
                 }
                 ActivityCompat.shouldShowRequestPermissionRationale(
@@ -161,7 +154,6 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        // Main UI
         AlcoholOrGasTheme(darkTheme = isDarkTheme.value) {
             Surface(tonalElevation = 5.dp) {
                 NavHost(navController = navController, startDestination = "alcoholOrGas") {

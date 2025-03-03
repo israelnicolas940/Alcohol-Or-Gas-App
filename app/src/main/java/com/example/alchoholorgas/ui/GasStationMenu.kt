@@ -27,8 +27,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.alchoholorgas.R
 import com.example.alchoholorgas.SharedPreferencesManager
 import com.example.alchoholorgas.data.GasStation
 import com.example.alchoholorgas.ui.components.PriceBar
@@ -64,7 +66,7 @@ fun GasStationMenu(navController: NavHostController, gasStationID: Int) {
         )
     ) {
         PriceBar(
-            label = "Preço da gasolina",
+            label = stringResource(R.string.gas_price),
             text = gasPrice.toString(),
             onTextChange = {
                 gasStation.gasPrice = it.toDoubleOrNull() ?: 0.0
@@ -73,7 +75,7 @@ fun GasStationMenu(navController: NavHostController, gasStationID: Int) {
             modifier = Modifier.fillMaxWidth()
         )
         PriceBar(
-            label = "Preço do álcool",
+            label = stringResource(R.string.alcohol_price),
             text = alcoholPrice.toString(),
             onTextChange = {
                 gasStation.alcoholPrice = it.toDoubleOrNull() ?: 0.0
@@ -83,7 +85,7 @@ fun GasStationMenu(navController: NavHostController, gasStationID: Int) {
         )
         OutlinedTextField(
             label = {
-                Text("Nome do posto")
+                Text(stringResource(R.string.station_name))
             },
             value = name,
             onValueChange = {
@@ -94,7 +96,7 @@ fun GasStationMenu(navController: NavHostController, gasStationID: Int) {
         )
         OutlinedTextField(
             label = {
-                Text("Endereço do posto")
+                Text(stringResource(R.string.station_address))
             },
             value = address,
             onValueChange = {
@@ -110,11 +112,12 @@ fun GasStationMenu(navController: NavHostController, gasStationID: Int) {
 
                 preferencesManager.saveString("gas_station_json_$gasStationID", jsonGasStation.toString())
 
-                Toast.makeText(context, "Alterações salvas com sucesso!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.saved_updates), Toast.LENGTH_SHORT).show()
                 navController.popBackStack()
             }
         ) {
-            Text("Salvar alterações")
+            Text(stringResource(R.string.save_updates))
         }
 
         Row(
@@ -128,13 +131,28 @@ fun GasStationMenu(navController: NavHostController, gasStationID: Int) {
         ) {
             FloatingActionButton(
                 onClick = {
-                    val googleMapsUri = Uri.parse("geo:geo:0,0?q=${gasStation.address}")
-                    val googleMapsIntent = Intent(Intent.ACTION_VIEW, googleMapsUri)
-                    googleMapsIntent.setPackage("com.google.android.apps.maps")
-                    context.startActivity(googleMapsIntent)
+                    // Extract latitude and longitude
+                    val latLngRegex = """Lat: ([-+]?\d*\.\d+), Lng: ([-+]?\d*\.\d+)""".toRegex()
+                    val matchResult = latLngRegex.find(gasStation.address)
+                    if (matchResult != null) {
+                        val (lat, lng) = matchResult.destructured
+                        val googleMapsUri =  Uri.parse("geo:$lat,$lng?q=$lat,$lng(${gasStation.name})")
+                        val googleMapsIntent = Intent(Intent.ACTION_VIEW, googleMapsUri)
+                        googleMapsIntent.setPackage("com.google.android.apps.maps")
+                        try {
+                            context.startActivity(googleMapsIntent)
+                        } catch (e: Error) {
+                            // Handle the case where Google Maps is not installed
+                            Toast.makeText(context,
+                                context.getString(R.string.unexpected_error), Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context,
+                            context.getString(R.string.invalid_location), Toast.LENGTH_SHORT).show()
+                    }
                 }
             ) {
-                Icon(Icons.Filled.LocationOn, "Apagar Posto")
+                Icon(Icons.Filled.LocationOn, stringResource(R.string.delete_station))
             }
 
             FloatingActionButton(
@@ -154,11 +172,12 @@ fun GasStationMenu(navController: NavHostController, gasStationID: Int) {
                     gasStationCounter--
                     preferencesManager.saveInt("gas_station_counter", gasStationCounter)
 
-                    Toast.makeText(context, "Posto removido com sucesso!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        context.getString(R.string.successfully_delete), Toast.LENGTH_SHORT).show()
                     navController.popBackStack()
                 }
             ) {
-                Icon(Icons.Filled.Delete, "Apagar Posto")
+                Icon(Icons.Filled.Delete, context.getString(R.string.delete_station))
             }
         }
     }
